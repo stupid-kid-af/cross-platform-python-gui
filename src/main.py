@@ -1,22 +1,56 @@
-# this is needed for supporting Windows 10 with OpenGL < v2.0
-# Example: VirtualBox w/ OpenGL v1.1
-import platform, os
-if platform.system() == 'Windows':
-    os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
+import sys,random
+from PyQt5 import QtGui,uic
+from PyQt5.QtWidgets import QApplication,QMainWindow
+from PyQt5.uic.uiparser import QtWidgets
+from functions import visitRepo
+from PyQt5 import QtWidgets
+from PyQt5 import *
+from About import Ui_MainWindow
 
-import kivy
-#kivy.require('1.0.6') # replace with your current kivy version !
+class UI(QMainWindow):
+    def __init__(self):
+        super(UI,self).__init__()
+        uic.loadUi("dice.ui",self)
+        self.roll()
+        self.pushButton.clicked.connect(self.roll)
+        self.actionVisit_Github_Repository.triggered.connect(visitRepo)
+        self.fulls.triggered.connect(self.full)
+        self.actionAbout.triggered.connect(self.gotoScreen2)
+        self.fulls.setShortcut("F11")
+        self.fulls.setStatusTip("Change to fullscreen mode")
+        
+    
 
-from kivy.app import App
-from kivy.uix.label import Label
+    def gotoScreen2 (self):
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self.window)
+        self.window.show()
 
-class MyApp(App):
+    def full (self):
+        self.showFullScreen() 
+        self.fulls.setText("Exit Full-Screen")
+        self.fulls.triggered.connect(self.toggleFullScreen)
+        
+        
+        # ...
 
-    def build(self):
-        return Label(text='Hello world!')
+    def toggleFullScreen(self):
+        if self.isFullScreen():
+            self.showNormal()
+            self.fulls.setText("Enter Full-Screen")
+        else:
+            self.showFullScreen()
+            self.fulls.setText("Exit Full-Screen")
+            
 
-
-if __name__ == '__main__':
-    MyApp().run()
-
-
+   
+    def roll(self):
+        arr=["Resources/Images/1.png","Resources/Images/2.png","Resources/Images/3.png","Resources/Images/4.png","Resources/Images/5.png","Resources/Images/6.png"]
+        q=QtGui.QPixmap(random.choice(arr))
+        self.label.setPixmap(q)
+    
+app=QApplication(sys.argv)
+win=UI()
+win.show()
+app.exec_()
